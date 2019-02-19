@@ -65,16 +65,42 @@ def get_table():
     return html_table
 
 
+def get_hemispheres():
+    browser = init_browser()
+    url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    resp = requests.get(url)
+    soup = BeautifulSoup(resp.text, 'html.parser')
+    image_divs = soup.find_all('div', class_='item')
+    titles = list()
+    for image_div in image_divs:
+        title_a = image_div.find('a', class_='itemLink')
+        title = title_a.find('h3').text
+        titles.append(title)
+    hemisphere_image_urls = list()
+    for title in titles:
+        browser.visit(url)
+        browser.click_link_by_partial_text(title)
+        html = browser.html
+        soup = BeautifulSoup(html, 'html.parser')
+        img_link = soup.find('img', class_='wide-image')['src']
+        img_url = 'https://astrogeology.usgs.gov' + img_link
+        hemisphere_image_urls.append({'title': title, 'img_url': img_url})
+    browser.quit()
+    return hemisphere_image_urls
+
+
 def scrape():
     news_title, news_p = get_news()
     featured_image_url = get_featured_image()
     mars_weather = get_tweet()
     html_table = get_table()
+    hemisphere_image_urls = get_hemispheres()
     mars_data = {
         "news_title": news_title,
         "news_p": news_p,
         "feature_image_url": featured_image_url,
         "mars_weather": mars_weather,
         "html_table": html_table,
+        "hemisphere_image_urls": hemisphere_image_urls,
     }
     return mars_data
