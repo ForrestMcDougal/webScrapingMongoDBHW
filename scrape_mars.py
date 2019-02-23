@@ -5,9 +5,11 @@ from bs4 import BeautifulSoup
 from splinter import Browser
 import pandas as pd
 
+
 def init_browser():
     executable_path = {"executable_path": "/usr/local/bin/chromedriver"}
     return Browser("chrome", **executable_path, headless=False)
+
 
 def get_news():
     url = 'https://mars.nasa.gov/news/'
